@@ -129,6 +129,7 @@ def main(args):
     for epoch in range(args.epochs):
         train_loader.sampler.set_epoch(epoch)
         # train
+        print('enter one epoch')
         train_loss, train_acc = train_one_epoch(model=model,
                                                 optimizer=optimizer,
                                                 data_loader=train_loader,
