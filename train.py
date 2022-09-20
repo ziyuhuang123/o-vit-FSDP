@@ -8,7 +8,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
 from vit_pytorch import ViT
-from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+from fairscale.nn.data_parallel import FullyShardedDataParallel
 from my_dataset import MyDataSet
 from vit_model import vit_base_patch16_224_in21k as create_model
 from utils import read_split_data, train_one_epoch, evaluate
@@ -101,7 +101,7 @@ def main(args):
     emb_dropout = 0.1
     ).to(device)
     model = DDP(model, device_ids=[int(local_rank)], output_device=int(local_rank),find_unused_parameters=True) # 此处必须要加find_unused这个奇怪的参数。。？诡异。暂时没研究原理
-    model = FSDP(model)
+    model = FullyShardedDataParallel(model(), flatten_parameters=False)
     if args.weights != "":
         assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
         weights_dict = torch.load(args.weights, map_location=device)
