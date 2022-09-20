@@ -101,7 +101,9 @@ def main(args):
     emb_dropout = 0.1
     ).to(device)
     model = DDP(model, device_ids=[int(local_rank)], output_device=int(local_rank),find_unused_parameters=True) # 此处必须要加find_unused这个奇怪的参数。。？诡异。暂时没研究原理
+    print('enter before FSDP')
     model = FullyShardedDataParallel(model(), flatten_parameters=False)
+    print('enter after FSDP')
     if args.weights != "":
         assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
         weights_dict = torch.load(args.weights, map_location=device)
