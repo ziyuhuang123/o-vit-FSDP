@@ -15,6 +15,7 @@ from utils import read_split_data, train_one_epoch, evaluate
 # 新增1:依赖
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 
 def main(args):
 
@@ -102,7 +103,7 @@ def main(args):
     ).to(device)
     model = DDP(model, device_ids=[int(local_rank)], output_device=int(local_rank),find_unused_parameters=True) # 此处必须要加find_unused这个奇怪的参数。。？诡异。暂时没研究原理
     print('enter before FSDP')
-    model = FullyShardedDataParallel(model, flatten_parameters=False)
+    model = FSDP(model)
     print('enter after FSDP')
     if args.weights != "":
         assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
